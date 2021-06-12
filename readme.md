@@ -1,5 +1,5 @@
-#Inventario
-####one stop to store all your products
+# Inventario
+#### one stop to store all your products
 
 [![Python Version](https://img.shields.io/badge/python-3.8-brightgreen.svg)](https://python.org)
 [![Django Version](https://img.shields.io/badge/django-3.2-brightgreen.svg)](https://djangoproject.com)
@@ -12,11 +12,11 @@ This is a django project to illustrate the implementation of an Oracle database 
 ![Inventario homepage Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/hompage.jpg)
 ![Inventario homepage with pagnation Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/hompage%20with%20pagnation.jpg)
 ### Add Product
-![Inventario Add Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/hompage.jpg)
+![Inventario Add Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/Add%20product.jpg)
 ### Edit Product
-![Inventario Edit Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/hompage.jpg)
+![Inventario Edit Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/edit%20product.jpg)
 ### Delete Product
-![Inventario Delete Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/hompage.jpg)
+![Inventario Delete Product Screenshot](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/Screenshots/delete%20product.jpg)
 
 
 ## Running the Project Locally
@@ -27,17 +27,19 @@ First, clone the repository to your local machine:
 git clone https://github.com/livingdead3551/Inventario-django-oracle-database-integration.git
 ```
 
-Install Oracle Database using the instructions given in [Django 3.2 oracle integration guide](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/django%203.2%20oracle%20integration%20guide.pdf).
-
 Install the requirements:
 
 ```bash
 pip install -r requirements.txt
 ```
 
+Install Oracle Database using the instructions given in [Django 3.2 oracle integration guide](https://github.com/livingdead3551/Inventario-django-oracle-database-integration/blob/master/django%203.2%20oracle%20integration%20guide.pdf).
+
+
 Create the database:
 
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
