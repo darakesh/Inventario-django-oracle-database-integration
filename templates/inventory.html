@@ -20,8 +20,9 @@
     <div class="row">
         <div class="col">
             <div class="container">
-                <div>
-                    {% for message in messages %}
+               
+                {% for message in messages %}
+                    <div>
                         {% if message.tags == 'error' %}
                             <p class="alert alert-danger" role="alert">{{message}}<p>
                         {% elif message.tags == 'success' %}
@@ -29,23 +30,24 @@
                         {% else %}
                             <p class="alert alert-info" role="alert">{{message}}<p>
                         {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="shadow p-3 mb-5 bg-white rounded">
+                    </div>
+                {% endfor %}
+                
+                <div class="shadow d-flex p-3 mb-5 bg-white rounded">
                     {% if productCount == 0 %}
-                        <span class="lead">Your inventory is empty. Add Products</span>
+                        <span class="lead ">Your inventory is empty. Add Products</span>
                     {% else %}
-                        <span class="lead">Products Stored : <strong>{{productCount}}</strong></span>
+                        <span class="lead my-auto">Products Stored : <strong>{{productCount}}</strong></span>
                     {% endif %}
-                    <button type="button" class="btn btn-success d-flex float-right" data-toggle="modal" data-target="#AddModal" ><span class="material-icons">add_circle</span> Add Product</button>
+                    <button type="button" class="btn btn-success d-flex ml-auto" data-toggle="modal" data-target="#AddModal" ><span class="material-icons mr-2">add_circle</span> Add Product</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- product table -->
+    {% if products %}
     <div class="row">
-        <div class="col justify-content-center text-center">
-            {% if products %}
+        <div class="col justify-content-center text-center">    
             <div class="container">
                 <table class= "table table-striped shadow rounded">
                     <thead class="thead-dark">
@@ -74,9 +76,9 @@
                 </table>
                 {% include "snippets/pagination.html" %}
             </div>  
-            {% endif %}
         </div>
     </div>
+    {% endif %}
 </div>
 
 
@@ -126,7 +128,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success">Edit Product</button>
+                <button type="submit" class="btn btn-primary">Edit Product</button>
             </div>
         </form>
       </div>
@@ -188,7 +190,7 @@
             var model = $(this);
             model.find('#id_product_code').val(productcode)
             model.find('#id_name').val(productname)
-            model.find('#id-quantity').val(productquantity)
+            model.find('#id_quantity').val(productquantity)
             model.find('#editForm').attr("action",urlpath)
         });
 
