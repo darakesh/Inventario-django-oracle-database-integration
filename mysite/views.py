@@ -1,74 +1,19 @@
 from django.shortcuts import render , redirect
-from .models import product
-from .forms import productform
+from django.views.decorators.http import require_POST
+
 from django.contrib import messages
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator 
+
+from .models import product
+from .forms import productform
+
 # Create your views here.
 
-def pagination(request, location = None):
-    all_products = product.objects.order_by("id")
-    paginator = Paginator(all_products,5,2)
-    if location == "END":
-        pageNo = paginator.num_pages
-    else:
-        pageNo = request.GET.get('page',1)
-    try:
-        products = paginator.get_page(pageNo)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-    
-    return products,all_products.count()
 
 def home_view(request):
-    
-    if request.POST.get("btn") == "Add":
-        form = productform(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Product Added sucessfully!!!")
-            products, count = pagination(request ,"END")
-    else:
-         products, count = pagination(request)        
-    form = productform()
-    btn = "Add"
-    context = {'products': products , 'productform' : form , 'btnval' : btn , "productCount" : count }
-
-    return render(request,'main.html',context)
-    
-def edit_view(request,pk):
-    item = product.objects.filter(id = pk)
-    form = productform(instance=item.first())
-    btn = "Save"
-    products, count = pagination(request)
-    print(request)
-    print(request.GET)
-    print(products)
+    all_products = product.objects.order_by("id")
    
-    if request.POST.get("btn") == "Save":
-        form = productform( request.POST, instance= item.first())
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Product Edited sucessfully!!!")
-            products, count = pagination(request, "CURRENT")
-    
-    context = {'products':products , 'productform' : form , 'btnval' : btn , "productCount" : count }
-
-    return render(request,'main.html',context)
-
-
-def delete_view(request,pk):
-    item = product.objects.get(id = pk)
-    item.delete()
-    messages.success(request, "Product Deleted sucessfully!!!")
-    return redirect("home")
-
-
-
-def home_view(request):
-    all_products = product.objects.order_by("id")
-    paginator = Paginator(all_products,5,2)
+    paginator = Paginator(all_products,5,1)
     pageNo = request.GET.get('page',1)
     try:
         products = paginator.get_page(pageNo)
@@ -76,16 +21,38 @@ def home_view(request):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+
     form = productform()
-    btn = "Add"
-    context = {'products':products , 'productform' : form , 'btnval' : btn , "productCount" : all_products.count() }
-    return render(request,'main.html',context)
+    context = {'products' : products, 'productform' : form, "productCount" : all_products.count() }
 
+    return render(request,'inventory.html',context)
+
+@require_POST
 def add_product(request):
-    pass
+    form = productform(request.POST)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Product Created sucessfully!")
+    else:
+        for err in form.errors:
+            messages.error(request,form.errors[err][0])
+    return redirect('home')
 
-def edit_product(request):
-    pass
+@require_POST
+def edit_product(request,pk):
+    item = product.objects.get(id = pk)
+    form = productform( request.POST, instance= item)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Product Edited sucessfully!")
+    else:
+        for err in form.errors:
+            messages.error(request,form.errors[err][0])
+    return redirect('home')
 
-def delete_product(request):
-    pass
+@require_POST
+def delete_product(request,pk):
+    item = product.objects.get(id = pk)
+    item.delete()
+    messages.success(request, "Product Deleted sucessfully!")
+    return redirect("home")

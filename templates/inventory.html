@@ -1,0 +1,199 @@
+{% extends "index.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- heading title -->
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h1 class="display-3">Inventario</h1>
+                    <b class="lead">One stop to store all your products.</b>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- shadow box -->
+    <div class="row">
+        <div class="col">
+            <div class="container">
+                <div>
+                    {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                            <p class="alert alert-danger" role="alert">{{message}}<p>
+                        {% elif message.tags == 'success' %}
+                            <p class="alert alert-success" role="alert">{{message}}<p>
+                        {% else %}
+                            <p class="alert alert-info" role="alert">{{message}}<p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="shadow p-3 mb-5 bg-white rounded">
+                    {% if productCount == 0 %}
+                        <span class="lead">Your inventory is empty. Add Products</span>
+                    {% else %}
+                        <span class="lead">Products Stored : <strong>{{productCount}}</strong></span>
+                    {% endif %}
+                    <button type="button" class="btn btn-success d-flex float-right" data-toggle="modal" data-target="#AddModal" ><span class="material-icons">add_circle</span> Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- product table -->
+    <div class="row">
+        <div class="col justify-content-center text-center">
+            {% if products %}
+            <div class="container">
+                <table class= "table table-striped shadow rounded">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">S.NO</th>
+                            <th scope="col">Product Code</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td scope="row">{{forloop.counter0|add:products.start_index }}</td>
+                            <td>{{product.product_code}}</td>
+                            <td>{{product.name}}</td>
+                            <td>{{product.quantity}}</td>
+                            <td> 
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal" data-pid="{{product.id}}" data-pname="{{product.name}}" data-pcode="{{product.product_code}}" data-pquantity="{{product.quantity}}">Edit</button>
+                                <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteModal" data-pid="{{product.id}}" data-pname="{{product.name}}">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% include "snippets/pagination.html" %}
+            </div>  
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<!-- Add model -->
+<div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="AddModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="AddModalLabel">Add Product</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="add/">
+            <div class="modal-body">
+
+                {% csrf_token %}
+                {{productform|crispy}}
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success">Add Product</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+
+<!-- editModel -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Product</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="editForm" method="POST" action="">
+            <div class="modal-body">
+            
+                {% csrf_token %}
+                {{productform|crispy}}
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success">Edit Product</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+<!-- deletemodal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Do you want to delete this <strong id="pname"></strong> product?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <form id="deleteform" action="" method="POST">
+                {% csrf_token %}
+                <input type="submit" class= "btn btn-danger" value="Delete">
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Jquery functions-->
+<script>
+    
+    $(document).ready(function(){
+
+        //deleting product
+        $("#deleteModal").on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            
+            var productname = button.data('pname');
+            var productid = button.data('pid');
+            var urlpath = "/delete/"+productid+"/";
+
+            var modal = $(this);
+            modal.find('#pname').text(productname)
+            modal.find('#deleteform').attr("action",urlpath)
+        });
+
+        //editing product
+        $("#editModal").on('show.bs.modal',function (event) {
+            var button = $(event.relatedTarget);
+
+            var productid = button.data('pid');
+            var productname = button.data('pname');
+            var productcode = button.data('pcode');
+            var productquantity = button.data('pquantity');
+            var urlpath = "/edit/"+productid+"/";
+
+            var model = $(this);
+            model.find('#id_product_code').val(productcode)
+            model.find('#id_name').val(productname)
+            model.find('#id-quantity').val(productquantity)
+            model.find('#editForm').attr("action",urlpath)
+        });
+
+
+    });
+</script>
+
+{% endblock %}
